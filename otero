@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Othello Game</title>
+    <style>
+        /* スタイルを設定 */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            gap: 2px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            background-color: #008000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Othello Game</h1>
+    <div class="board" id="board"></div>
+    <script>
+        // ゲームの初期状態を作成
+        const boardElement = document.getElementById('board');
+        const board = Array(8).fill().map(() => Array(8).fill(0));
+        let currentPlayer = 1; // 1: 黒, 2: 白
+
+        // ゲームボードを描画
+        function renderBoard() {
+            boardElement.innerHTML = '';
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.style.backgroundColor = board[row][col] === 1 ? 'black' : (board[row][col] === 2 ? 'white' : '#008000');
+                    cell.addEventListener('click', () => placePiece(row, col));
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        // 石を置く
+        function placePiece(row, col) {
+            if (board[row][col] === 0) {
+                board[row][col] = currentPlayer;
+                flipPieces(row, col, -1, -1);
+                flipPieces(row, col, -1, 0);
+                flipPieces(row, col, -1, 1);
+                flipPieces(row, col, 0, -1);
+                flipPieces(row, col, 0, 1);
+                flipPieces(row, col, 1, -1);
+                flipPieces(row, col, 1, 0);
+                flipPieces(row, col, 1, 1);
+                currentPlayer = 3 - currentPlayer; // スイッチ プレイヤー（1 → 2, 2 → 1）
+                renderBoard();
+            }
+        }
+
+        // 石を裏返す
+        function flipPieces(row, col, dr, dc) {
+            const otherPlayer = 3 - currentPlayer;
+            let r = row + dr;
+            let c = col + dc;
+            let flipped = false;
+            while (r >= 0 && r < 8 && c >= 0 && c < 8 && board[r][c] === otherPlayer) {
+                r += dr;
+                c += dc;
+                if (board[r][c] === currentPlayer) {
+                    flipped = true;
+                    break;
+                }
+            }
+            if (flipped) {
+                r = row + dr;
+                c = col + dc;
+                while (board[r][c] === otherPlayer) {
+                    board[r][c] = currentPlayer;
+                    r += dr;
+                    c += dc;
+                }
+            }
+        }
+
+        // ゲームを開始
+        renderBoard();
+    </script>
+</body>
+</html>
